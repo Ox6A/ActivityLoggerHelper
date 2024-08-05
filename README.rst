@@ -32,8 +32,8 @@ Installing
 Notes
 -----
 - Follow this guide to setup your bot: https://discordpy.readthedocs.io/en/stable/discord.html
-- You must place your Bot's token in a ``token.txt`` file, located in the same directory as the script. (``ActivityLoggerHelper``)
 - You do not require ``discord-py[voice]``.
+- You must place your Bot's token in a ``token.txt`` file, located in the same directory as the script. (``ActivityLoggerHelper``)
 
 Links
 ------
