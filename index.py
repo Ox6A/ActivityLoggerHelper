@@ -1,14 +1,13 @@
 import discord
 import asyncio
-import logging
-from datetime import datetime, timedelta
 import re
+from datetime import datetime, timedelta
 import time
 from discord import app_commands
 
-logging.basicConfig(level=logging.INFO)
+requiredRole = 1272168995419717713
+
 token = None
-startTime = int(time.perf_counter())
 embed1 = None
 
 intents = discord.Intents.default()
@@ -38,7 +37,7 @@ async def fetchActivity(channel, steamID):
             match = re.search(rf"\({steamID}\).*for `(\d{{2}}:\d{{2}}:\d{{2}})`", content)
             if match:
                 timeStr = match.group(1)
-                totalSeconds +=  timeToSeconds(timeStr)
+                totalSeconds += timeToSeconds(timeStr)
     totalActivity = str(timedelta(seconds=totalSeconds))
     embed1 = discord.Embed(title="Activity Logged (1 week)", description=f"`{steamID}` has been on PD for `{totalActivity}`", color=0x0483fb)    
 
@@ -49,8 +48,17 @@ async def on_ready():
 @client.tree.command(name="activity", description="Fetch activity for a SteamID in the past week")
 async def activity(interaction: discord.Interaction, steamid: str):
     global embed1
-    await fetchActivity(interaction.channel, steamid)
-    await interaction.response.send_message(embed=embed1, ephemeral=True)
+    global requiredRole
+    if requiredRole in [role.id for role in interaction.user.roles]:
+        if steamid.startswith("STEAM_"):
+            await fetchActivity(interaction.channel, steamid)
+            await interaction.response.send_message(embed=embed1, ephemeral=True)
+        else:
+            embed1 = discord.Embed(title="Invalid parameters", description="The SteamID supplied either does not exist, or is of an invalid format. Please enter the ID in this format: `STEAM_0:0:431471716`", color=0x0483fb)
+            await interaction.response.send_message(embed=embed1, ephemeral=True)
+    else:
+        embed1 = discord.Embed(title="Permission Denied", description="You do not have the required permissions to use this command.", color=0x0483fb)
+        await interaction.response.send_message(embed=embed1, ephemeral=True
 
 def loadToken():
     global token
