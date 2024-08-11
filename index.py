@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import time
 from discord import app_commands
 
-requiredRole = 1272168995419717713
+PDActivityChannel = 1269777958860492883
 
 token = None
 embed1 = None
@@ -39,7 +39,7 @@ async def fetchActivity(channel, steamID):
                 timeStr = match.group(1)
                 totalSeconds += timeToSeconds(timeStr)
     totalActivity = str(timedelta(seconds=totalSeconds))
-    embed1 = discord.Embed(title="Activity Logged (1 week)", description=f"`{steamID}` has been on PD for `{totalActivity}`", color=0x0483fb)    
+    embed1 = discord.Embed(title="Activity Logged", description=f"`{steamID}` has been on PD for `{totalActivity}` for the past `1 week`", color=0x0483fb)    
 
 @client.event
 async def on_ready():
@@ -48,17 +48,28 @@ async def on_ready():
 @client.tree.command(name="activity", description="Fetch activity for a SteamID in the past week")
 async def activity(interaction: discord.Interaction, steamid: str):
     global embed1
-    global requiredRole
-    if requiredRole in [role.id for role in interaction.user.roles]:
-        if steamid.startswith("STEAM_"):
-            await fetchActivity(interaction.channel, steamid)
-            await interaction.response.send_message(embed=embed1, ephemeral=True)
+    global PDActivityChannel
+    channelToBeUsed = None
+
+    PDChannelObj = client.get_channel(PDActivityChannel)
+    if PDChannelObj:
+        permissions = interaction.user.permissions_in(PDChannelObj)
+        if permissions.read_messages:
+            hasPerms = True
+            channelToBeUsed = PDChannelObj
         else:
-            embed1 = discord.Embed(title="Invalid parameters", description="The SteamID supplied either does not exist, or is of an invalid format. Please enter the ID in this format: `STEAM_0:0:431471716`", color=0x0483fb)
+            embed1 = discord.Embed(title="Permission Denied", description="You do not have the required permsisions to use this bot. If this in error, please contact `teasippingbrit` on Discord.", color=0xFF0000)
             await interaction.response.send_message(embed=embed1, ephemeral=True)
+            return
+
+    if channelToBeUsed == None:
+        return
+    if steamid.startswith("STEAM_"):
+        await fetchActivity(channelToBeUsed, steamid)
+        await interaction.response.send_message(embed=embed1, ephemeral=True)
     else:
-        embed1 = discord.Embed(title="Permission Denied", description="You do not have the required permissions to use this command.", color=0x0483fb)
-        await interaction.response.send_message(embed=embed1, ephemeral=True
+        embed1 = discord.Embed(title="Invalid parameters", description="The SteamID supplied either does not exist, or is of an invalid format. Please enter the ID in this format: `STEAM_0:0:431471716`", color=0x0483fb)
+        await interaction.response.send_message(embed=embed1, ephemeral=True)
 
 def loadToken():
     global token
