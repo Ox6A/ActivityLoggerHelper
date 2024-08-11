@@ -12,6 +12,8 @@ embed1 = None
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.guilds = True
+intents.members = True
 
 class ActivityLogger(discord.Client):
     def __init__(self, intents):
@@ -22,6 +24,10 @@ class ActivityLogger(discord.Client):
         await self.tree.sync()
 
 client = ActivityLogger(intents=intents)
+
+async def sendErrorMsg(interaction):
+    embed1 = discord.Embed(title="Error occured during runtime", description="A critical error occured whilst running the command. Please contact `teasippingbrit` on Discord.", color=0xFF0000)
+    await interaction.response.send_message(embed=embed1, ephemeral=True)
 
 def timeToSeconds(timeStr):
     hours, mins, seconds = map(int, timeStr.split(":"))
@@ -39,7 +45,7 @@ async def fetchActivity(channel, steamID):
                 timeStr = match.group(1)
                 totalSeconds += timeToSeconds(timeStr)
     totalActivity = str(timedelta(seconds=totalSeconds))
-    embed1 = discord.Embed(title="Activity Logged", description=f"`{steamID}` has been on PD for `{totalActivity}` for the past `1 week`", color=0x0483fb)    
+    embed1 = discord.Embed(title="Activity Logged", description=f"`{steamID}` has been on PD for `{totalActivity}` for the past `1 week`", color=0x0483fb)
 
 @client.event
 async def on_ready():
@@ -53,14 +59,25 @@ async def activity(interaction: discord.Interaction, steamid: str):
 
     PDChannelObj = client.get_channel(PDActivityChannel)
     if PDChannelObj:
-        permissions = interaction.user.permissions_in(PDChannelObj)
-        if permissions.read_messages:
-            hasPerms = True
-            channelToBeUsed = PDChannelObj
-        else:
-            embed1 = discord.Embed(title="Permission Denied", description="You do not have the required permsisions to use this bot. If this in error, please contact `teasippingbrit` on Discord.", color=0xFF0000)
-            await interaction.response.send_message(embed=embed1, ephemeral=True)
+        try:
+            caller = interaction.guild.get_member(interaction.user.id)
+            if caller:
+                permissions = PDChannelObj.permissions_for(caller)
+                if permissions.read_messages:
+                    channelToBeUsed = PDChannelObj
+                else:
+                    embed1 = discord.Embed(title="Permission Denied", description="You do not have the required permsisions to use this bot. If this in error, please contact `teasippingbrit` on Discord.", color=0xFF0000)
+                    await interaction.response.send_message(embed=embed1, ephemeral=True)
+                    return
+            else:
+                await sendErrorMsg(interaction)
+                return
+        except Exception as e:
+            with open("errors.log", "a") as f:
+                f.write(e)
+            await sendErrorMsg(interaction)
             return
+
 
     if channelToBeUsed == None:
         return
