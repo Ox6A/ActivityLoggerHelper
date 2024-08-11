@@ -23,6 +23,10 @@ class ActivityLogger(discord.Client):
 
 client = ActivityLogger(intents=intents)
 
+async def sendErrorMsg(interaction):
+    embed1 = discord.Embed(title="Error occured during runtime", description="A critical error occured whilst running the command. Please contact `teasippingbrit` on Discord.", color=0xFF0000)
+    await interaction.response.send_message(embed=embed1, ephemeral=True)
+
 def timeToSeconds(timeStr):
     hours, mins, seconds = map(int, timeStr.split(":"))
     return (hours * 3600) + (mins * 60) + seconds
@@ -53,14 +57,22 @@ async def activity(interaction: discord.Interaction, steamid: str):
 
     PDChannelObj = client.get_channel(PDActivityChannel)
     if PDChannelObj:
-        permissions = interaction.user.permissions_in(PDChannelObj)
-        if permissions.read_messages:
-            hasPerms = True
-            channelToBeUsed = PDChannelObj
-        else:
-            embed1 = discord.Embed(title="Permission Denied", description="You do not have the required permsisions to use this bot. If this in error, please contact `teasippingbrit` on Discord.", color=0xFF0000)
-            await interaction.response.send_message(embed=embed1, ephemeral=True)
+        try:
+            caller = interaction.guild.get_member(interaction.user.id)
+            if caller:
+                permissions = caller.permissions_in(PDChannelObj)
+                if permissions.read_messages:
+                    channelToBeUsed = PDChannelObj
+                else:
+                    embed1 = discord.Embed(title="Permission Denied", description="You do not have the required permsisions to use this bot. If this in error, please contact `teasippingbrit` on Discord.", color=0xFF0000)
+                    await interaction.response.send_message(embed=embed1, ephemeral=True)
+                    return
+        except Exception as e:
+            with open("errors.log", "a") as f:
+                f.append(e)
+            await sendErrorMsg(interaction)
             return
+            
 
     if channelToBeUsed == None:
         return
