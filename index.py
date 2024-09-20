@@ -5,6 +5,7 @@ import json
 from datetime import datetime, timedelta
 import time
 from discord import app_commands
+import logging
 
 config = {}
 debugMode = False
