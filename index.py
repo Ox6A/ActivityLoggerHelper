@@ -36,6 +36,22 @@ logo = """
 token = None
 embed1 = None
 
+
+logging.basicConfig(level=logging.INFO)
+infologger = logging.getLogger('infologger')
+infohandler = logging.FileHandler('info.log')
+infohandler.setLevel(logging.INFO)
+info_format = logging.Formatter('%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+infohandler.setFormatter(info_format)
+infologger.addHandler(infohandler)
+
+errorlogger = logging.getLogger('errorlogger')
+errorhandler = logging.FileHandler('errors.log')
+errorhandler.setLevel(logging.ERROR)
+error_format = logging.Formatter('%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+errorhandler.setFormatter(error_format)
+errorlogger.addHandler(errorhandler)
+
 intents = discord.Intents.default()
 intents.message_content = True
 intents.guilds = True
@@ -91,13 +107,13 @@ async def fetchActivity(channel, steamID):
     channelName = list(config["channelid"].keys())[list(config["channelid"].values()).index(channel.id)].upper()
     if totalSeconds == 0:
         embed1 = discord.Embed(
-            title="No Activity Logged",
+            title=f"No Activity Logged ({channelName})",
             description=f"`{steamID}` has not been on {channelName} in the past `1 week`.",
             color=0x0483FB,
         )
     else:
         embed1 = discord.Embed(
-            title="Activity Logged",
+            title=f"Activity Logged ({channelName})",
             description=f"`{steamID}` has been on {channelName} for `{totalActivity}` for the past `1 week`",
             color=0x0483FB,
         )
@@ -114,9 +130,8 @@ async def activity(interaction: discord.Interaction, steamid: str):
     inEnabledGuild = False
     debuggingUserAllowed = False
 
-    print(
-        f"{datetime.now()} - {interaction.user.name} has searched the activity for {steamid}"
-    )
+    infologger.info("{interaction.user.name} has searched the activity for {steamid}")
+    print(f"{datetime.now()} - {interaction.user.name} has searched the activity for {steamid}")
 
     if debugMode == True:
         for i in config["debug_users"]:
@@ -125,7 +140,7 @@ async def activity(interaction: discord.Interaction, steamid: str):
         if debuggingUserAllowed == False:
             embed1 = discord.Embed(
                 title="Debugging Mode",
-                description="The bot is currently in a debuggging mode for testing or maintenance. Sorry for the inconvenience!",
+                description="The bot is currently in a debugging mode for testing or maintenance. Sorry for the inconvenience!",
                 color=0xFF0000,
             )
             await interaction.response.send_message(embed=embed1, ephemeral=True, delete_after=300)
@@ -150,6 +165,7 @@ async def activity(interaction: discord.Interaction, steamid: str):
                     break
     if inEnabledGuild == False:
         print("\033[93m\033[1mWARNING: Command sent in a disallowed guild\033[0m")
+        infologger.warning("Command send in a dissallowed guild")
         return
     ChannelObj = client.get_channel(config["channelid"][guildName])
     if channelType == 2:
@@ -173,8 +189,7 @@ async def activity(interaction: discord.Interaction, steamid: str):
                 await sendErrorMsg(interaction)
                 return
         except Exception as e:
-            with open("errors.log", "a") as f:
-                f.write(e)
+            errorlogger.error(f"Error during permission check: {str(e)}")
             await sendErrorMsg(interaction)
             return
     else:
@@ -202,12 +217,14 @@ async def activity(interaction: discord.Interaction, steamid: str):
 def loadToken():
     global token
     try:
+        infologger.info("Loading token")
         print("\033[1mLoading token...\033[0m")
         with open("token.txt", "r") as f:
             token = f.read()
         return True
     except Exception as e:
         print("\033[1m\033[91mERROR DURING LOADING BOT TOKEN: " + str(e) + "\033[0m")
+        errorlogger.error(f"Error during loading bot token: {str(e)}")
         return False
 
 
@@ -223,6 +240,7 @@ def loadConfig():
             + str(e)
             + "\033[0m"
         )
+        errorlogger.warning(f"Configuration loading failed, creating default config: {str(e)}")
         print("\033[1mGenerating default configuration...\033[0m")
         try:
             with open("config.json", "w") as f:
@@ -269,12 +287,14 @@ def loadConfig():
                 + str(e1)
                 + "\033[0m"
             )
+            errorlogger.error(f"Error during generating configuration: {str(e1)}")
             return False
 
 
 def main():
     global token
     global debugMode
+    infologger.info("Riverside Activity Calculator Bot: Starting...")
     print(
         "\n\033[1m\033[94mRiverside Activity Calculator Bot: Starting...\033[0m\n"
         + logo
