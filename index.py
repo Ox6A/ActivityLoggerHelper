@@ -88,7 +88,7 @@ async def fetchActivity(channel, steamID):
                 timeStr = match.group(1)
                 totalSeconds += timeToSeconds(timeStr)
     totalActivity = str(timedelta(seconds=totalSeconds))
-    channelName = config.keys()[config.values().index(channel.id)].upper()
+    channelName = list(config.keys())[list(config.values()).index(channel.id)].upper()
     if totalSeconds == 0:
         embed1 = discord.Embed(
             title="No Activity Logged",
