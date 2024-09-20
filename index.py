@@ -75,6 +75,7 @@ def timeToSeconds(timeStr):
 
 async def fetchActivity(channel, steamID):
     global embed1
+    global config
     totalSeconds = 0
     timeframe = datetime.now() - timedelta(days=7)
     async for message in channel.history(limit=None, after=timeframe):
@@ -87,16 +88,17 @@ async def fetchActivity(channel, steamID):
                 timeStr = match.group(1)
                 totalSeconds += timeToSeconds(timeStr)
     totalActivity = str(timedelta(seconds=totalSeconds))
+    channelName = config.keys()[config.values().index(channel.id)].upper()
     if totalSeconds == 0:
         embed1 = discord.Embed(
             title="No Activity Logged",
-            description=f"`{steamID}` has not been on PD in the past `1 week`.",
+            description=f"`{steamID}` has not been on {channelName} in the past `1 week`.",
             color=0x0483FB,
         )
     else:
         embed1 = discord.Embed(
             title="Activity Logged",
-            description=f"`{steamID}` has been on PD for `{totalActivity}` for the past `1 week`",
+            description=f"`{steamID}` has been on {channelName} for `{totalActivity}` for the past `1 week`",
             color=0x0483FB,
         )
 
