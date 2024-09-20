@@ -108,6 +108,7 @@ async def fetchActivity(channel, steamID):
 )
 async def activity(interaction: discord.Interaction, steamid: str):
     global embed1
+    channelType = 1
     channelToBeUsed = None
     guildToBeUsed = None
     inEnabledGuild = False
@@ -134,13 +135,25 @@ async def activity(interaction: discord.Interaction, steamid: str):
         if config["guilds"][i] == interaction.guild.id:
             for i1 in config["enabled_dept"]:
                 if i1 == i:
+                    if interaction.channel.id != config["channelid"][i]:
+                        guildToBeUsed = config["guilds"][i]
+                        try:
+                            guildName = list(config["channelid"].keys())[list(config["channelid"].values()).index(interaction.channel.id)]
+                        except Exception as e:
+                            print(e)
+                        inEnabledGuild = True
+                        channelType = 2
+                        break
                     guildToBeUsed = config["guilds"][i]
                     guildName = i
                     inEnabledGuild = True
+                    break
     if inEnabledGuild == False:
         print("\033[93m\033[1mWARNING: Command sent in a disallowed guild\033[0m")
         return
     ChannelObj = client.get_channel(config["channelid"][guildName])
+    if channelType == 2:
+        ChannelObj = client.get_channel(config["channelid"][guildName])
     if ChannelObj:
         try:
             caller = interaction.guild.get_member(interaction.user.id)
