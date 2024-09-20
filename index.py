@@ -127,7 +127,7 @@ async def activity(interaction: discord.Interaction, steamid: str):
                 description="The bot is currently in a debuggging mode for testing or maintenance. Sorry for the inconvenience!",
                 color=0xFF0000,
             )
-            await interaction.response.send_message(embed=embed1, ephemeral=True)
+            await interaction.response.send_message(embed=embed1, ephemeral=True, delete_after=300)
             return
 
     for i in config["guilds"]:
@@ -154,9 +154,7 @@ async def activity(interaction: discord.Interaction, steamid: str):
                         description="You do not have the required permsisions to use this bot. If this in error, please contact `teasippingbrit` on Discord.",
                         color=0xFF0000,
                     )
-                    await interaction.response.send_message(
-                        embed=embed1, ephemeral=True
-                    )
+                    await interaction.response.send_message(embed=embed1, ephemeral=True, delete_after=120)
                     return
             else:
                 await sendErrorMsg(interaction)
@@ -178,14 +176,14 @@ async def activity(interaction: discord.Interaction, steamid: str):
         return
     if steamid.startswith("STEAM_"):
         await fetchActivity(channelToBeUsed, steamid)
-        await interaction.response.send_message(embed=embed1, ephemeral=True)
+        await interaction.response.send_message(embed=embed1, ephemeral=True, delete_after=1200)
     else:
         embed1 = discord.Embed(
             title="Invalid parameters",
             description="The SteamID supplied either does not exist, or is of an invalid format. Please enter the ID in this format: `STEAM_0:0:431471716`",
             color=0x0483FB,
         )
-        await interaction.response.send_message(embed=embed1, ephemeral=True)
+        await interaction.response.send_message(embed=embed1, ephemeral=True, delete_after=1200)
 
 
 def loadToken():
