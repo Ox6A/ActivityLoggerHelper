@@ -125,6 +125,7 @@ async def fetchActivity(channel, steamID):
 )
 async def activity(interaction: discord.Interaction, steamid: str):
     global embed1
+    guildName = None
     channelType = 1
     channelToBeUsed = None
     guildToBeUsed = None
