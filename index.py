@@ -112,6 +112,11 @@ async def fetchActivity(channel, steamID):
     channelName = list(config["channelid"].keys())[
         list(config["channelid"].values()).index(channel.id)
     ].upper()
+    if channelName == "RS" or channelName == "T":
+        for i in config["longerNames"]:
+            if i == channelName:
+                channelName == config["longerNames"][i]
+                break
     if totalSeconds == 0:
         embed1 = discord.Embed(
             title=f"No Activity Logged ({channelName})",
@@ -269,6 +274,16 @@ def loadConfig():
         try:
             with open("config.json", "w") as f:
                 config = {
+                    "longerNames": {
+                        "pd": "Metropolitan Police",
+                        "so2": "Crime Support Branch",
+                        "sco-19": "Specialist Firearms Command",
+                        "sco": "SCO-19",
+                        "nca": "National Crime Agency",
+                        "nhs": "National Health Service",
+                        "rs": "Royal Syndicate",
+                        "t": "Terrorists"
+                    },
                     "channelid": {
                         "pd": 1090365529564385310,
                         "so2": 1141061367730806906,
