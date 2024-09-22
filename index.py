@@ -193,11 +193,11 @@ async def activity(interaction: discord.Interaction, steamid: str):
         if channelType == 2:
             ChannelObj = client.get_channel(config["channelid"][guildName])
     except Exception as e:
-        errorlogger.error(datetime.now() + str(e))
+        errorlogger.error(f"{datetime.now()} - " + str(e))
         embed1 = discord.Embed(
             title="Incorrect channel",
             description="You must run the `/activity` command in the corresponding activity logging channel (e.g #activity-log). If this in error, please contact `teasippingbrit` on Discord.",
-            color=0xFF0000
+            color=0xFF0000,
         )
         await interaction.response.send_message(
             embed=embed1, ephmeral=True, delete_after=1200
@@ -245,7 +245,7 @@ async def activity(interaction: discord.Interaction, steamid: str):
         )
     else:
         infologger.info(
-        f"{datetime.now()} - {interaction.user.name} ({interaction.user.id}) has used the incorrect format for {steamid} in {interaction.guild.name} ({interaction.guild.id})"
+            f"{datetime.now()} - {interaction.user.name} ({interaction.user.id}) has used the incorrect format for {steamid} in {interaction.guild.name} ({interaction.guild.id})"
         )
         embed1 = discord.Embed(
             title="Invalid parameters",
@@ -298,7 +298,7 @@ def loadConfig():
                         "nca": "National Crime Agency",
                         "nhs": "National Health Service",
                         "rs": "Royal Syndicate",
-                        "t": "Terrorists"
+                        "t": "Terrorists",
                     },
                     "channelid": {
                         "pd": 1090365529564385310,
@@ -373,4 +373,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
