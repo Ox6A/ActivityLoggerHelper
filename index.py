@@ -196,7 +196,7 @@ async def activity(interaction: discord.Interaction, steamid: str):
         errorlogger.error(f"{datetime.now()} - " + str(e))
         embed1 = discord.Embed(
             title="Incorrect channel",
-            description="You must run the `/activity` command in the corresponding activity logging channel (e.g #activity-log). If this in error, please contact `teasippingbrit` on Discord.",
+            description="You must run the `/activity` command in the corresponding activity logging channel (e.g `#activity-log`). If this in error, please contact `teasippingbrit` on Discord.",
             color=0xFF0000,
         )
         await interaction.response.send_message(
