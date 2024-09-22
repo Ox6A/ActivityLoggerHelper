@@ -200,7 +200,7 @@ async def activity(interaction: discord.Interaction, steamid: str):
             color=0xFF0000,
         )
         await interaction.response.send_message(
-            embed=embed1, ephmeral=True, delete_after=1200
+            embed=embed1, ephemeral=True, delete_after=1200
         )
         return
     if ChannelObj:
