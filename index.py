@@ -188,6 +188,7 @@ async def activity(interaction: discord.Interaction, steamid: str):
             f"{datetime.now()} - Command send in a dissallowed guild: {interaction.user.name} ({interaction.user.id}) has attempted to search the activity for {steamid} in {interaction.guild.name} ({interaction.guild.id})!"
         )
         return
+    print(guildName)
     ChannelObj = client.get_channel(config["channelid"][guildName])
     if channelType == 2:
         ChannelObj = client.get_channel(config["channelid"][guildName])
