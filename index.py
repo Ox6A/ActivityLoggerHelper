@@ -188,10 +188,21 @@ async def activity(interaction: discord.Interaction, steamid: str):
             f"{datetime.now()} - Command send in a dissallowed guild: {interaction.user.name} ({interaction.user.id}) has attempted to search the activity for {steamid} in {interaction.guild.name} ({interaction.guild.id})!"
         )
         return
-    print(guildName)
-    ChannelObj = client.get_channel(config["channelid"][guildName])
-    if channelType == 2:
+    try:
         ChannelObj = client.get_channel(config["channelid"][guildName])
+        if channelType == 2:
+            ChannelObj = client.get_channel(config["channelid"][guildName])
+    except Exception as e:
+        errorlogger.error(datetime.now() + str(e))
+        embed1 = discord.Embed(
+            title="Incorrect channel",
+            description="You must run the `/activity` command in the corresponding activity logging channel (e.g #activity-log). If this in error, please contact `teasippingbrit` on Discord.",
+            color=0xFF0000
+        )
+        await interaction.response.send_message(
+            embed=embed1, ephmeral=True, delete_after=1200
+        )
+        return
     if ChannelObj:
         try:
             caller = interaction.guild.get_member(interaction.user.id)
