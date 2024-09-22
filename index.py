@@ -39,17 +39,21 @@ embed1 = None
 
 
 logging.basicConfig(level=logging.INFO)
-infologger = logging.getLogger('infologger')
-infohandler = logging.FileHandler('info.log')
+infologger = logging.getLogger("infologger")
+infohandler = logging.FileHandler("info.log")
 infohandler.setLevel(logging.INFO)
-info_format = logging.Formatter('%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+info_format = logging.Formatter(
+    "%(asctime)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+)
 infohandler.setFormatter(info_format)
 infologger.addHandler(infohandler)
 
-errorlogger = logging.getLogger('errorlogger')
-errorhandler = logging.FileHandler('errors.log')
+errorlogger = logging.getLogger("errorlogger")
+errorhandler = logging.FileHandler("errors.log")
 errorhandler.setLevel(logging.ERROR)
-error_format = logging.Formatter('%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+error_format = logging.Formatter(
+    "%(asctime)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+)
 errorhandler.setFormatter(error_format)
 errorlogger.addHandler(errorhandler)
 
@@ -105,7 +109,9 @@ async def fetchActivity(channel, steamID):
                 timeStr = match.group(1)
                 totalSeconds += timeToSeconds(timeStr)
     totalActivity = str(timedelta(seconds=totalSeconds))
-    channelName = list(config["channelid"].keys())[list(config["channelid"].values()).index(channel.id)].upper()
+    channelName = list(config["channelid"].keys())[
+        list(config["channelid"].values()).index(channel.id)
+    ].upper()
     if totalSeconds == 0:
         embed1 = discord.Embed(
             title=f"No Activity Logged ({channelName})",
@@ -132,8 +138,9 @@ async def activity(interaction: discord.Interaction, steamid: str):
     inEnabledGuild = False
     debuggingUserAllowed = False
 
-    infologger.info("{interaction.user.name} has searched the activity for {steamid}")
-    print(f"{datetime.now()} - {interaction.user.name} has searched the activity for {steamid}")
+    infologger.info(
+        f"{datetime.now()} - {interaction.user.name} has searched the activity for {steamid} in {interaction.guildName} ({interaction.guild.id})"
+    )
 
     if debugMode == True:
         for i in config["debug_users"]:
@@ -145,7 +152,9 @@ async def activity(interaction: discord.Interaction, steamid: str):
                 description="The bot is currently in a debugging mode for testing or maintenance. Sorry for the inconvenience!",
                 color=0xFF0000,
             )
-            await interaction.response.send_message(embed=embed1, ephemeral=True, delete_after=300)
+            await interaction.response.send_message(
+                embed=embed1, ephemeral=True, delete_after=300
+            )
             return
 
     for i in config["guilds"]:
@@ -155,7 +164,11 @@ async def activity(interaction: discord.Interaction, steamid: str):
                     if interaction.channel.id != config["channelid"][i]:
                         guildToBeUsed = config["guilds"][i]
                         try:
-                            guildName = list(config["channelid"].keys())[list(config["channelid"].values()).index(interaction.channel.id)]
+                            guildName = list(config["channelid"].keys())[
+                                list(config["channelid"].values()).index(
+                                    interaction.channel.id
+                                )
+                            ]
                         except Exception as e:
                             print(e)
                         inEnabledGuild = True
@@ -166,8 +179,9 @@ async def activity(interaction: discord.Interaction, steamid: str):
                     inEnabledGuild = True
                     break
     if inEnabledGuild == False:
-        print("\033[93m\033[1mWARNING: Command sent in a disallowed guild\033[0m")
-        infologger.warning("Command send in a dissallowed guild")
+        infologger.warning(
+            f"{datetime.now()} - Command send in a dissallowed guild: {interaction.user.name} has attempted to search the activity for {steamid} in {interaction.guildName} ({interaction.guild.id})!"
+        )
         return
     ChannelObj = client.get_channel(config["channelid"][guildName])
     if channelType == 2:
@@ -185,7 +199,9 @@ async def activity(interaction: discord.Interaction, steamid: str):
                         description="You do not have the required permsisions to use this bot. If this in error, please contact `teasippingbrit` on Discord.",
                         color=0xFF0000,
                     )
-                    await interaction.response.send_message(embed=embed1, ephemeral=True, delete_after=120)
+                    await interaction.response.send_message(
+                        embed=embed1, ephemeral=True, delete_after=120
+                    )
                     return
             else:
                 await sendErrorMsg(interaction)
@@ -206,14 +222,18 @@ async def activity(interaction: discord.Interaction, steamid: str):
         return
     if steamid.startswith("STEAM_"):
         await fetchActivity(channelToBeUsed, steamid)
-        await interaction.response.send_message(embed=embed1, ephemeral=True, delete_after=1200)
+        await interaction.response.send_message(
+            embed=embed1, ephemeral=True, delete_after=1200
+        )
     else:
         embed1 = discord.Embed(
             title="Invalid parameters",
             description="The SteamID supplied either does not exist, or is of an invalid format. Please enter the ID in this format: `STEAM_0:0:431471716`",
             color=0x0483FB,
         )
-        await interaction.response.send_message(embed=embed1, ephemeral=True, delete_after=1200)
+        await interaction.response.send_message(
+            embed=embed1, ephemeral=True, delete_after=1200
+        )
 
 
 def loadToken():
@@ -242,7 +262,9 @@ def loadConfig():
             + str(e)
             + "\033[0m"
         )
-        errorlogger.warning(f"Configuration loading failed, creating default config: {str(e)}")
+        errorlogger.warning(
+            f"Configuration loading failed, creating default config: {str(e)}"
+        )
         print("\033[1mGenerating default configuration...\033[0m")
         try:
             with open("config.json", "w") as f:
@@ -267,7 +289,7 @@ def loadConfig():
                         "t": 472715289516048385,
                         "test": 1264515893610680393,
                     },
-                    "enabled_dept": ["test", "pd", "so2"],
+                    "enabled_dept": ["test"],
                     "minimum_role_requirement": {
                         "pd": 1179100367083016233,
                         "so2": 811356656276865034,
@@ -320,3 +342,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
