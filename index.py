@@ -144,7 +144,7 @@ async def activity(interaction: discord.Interaction, steamid: str):
     debuggingUserAllowed = False
 
     infologger.info(
-        f"{datetime.now()} - {interaction.user.name} has searched the activity for {steamid} in {interaction.guild.name} ({interaction.guild.id})"
+        f"{datetime.now()} - {interaction.user.name} ({interaction.user.id}) has searched the activity for {steamid} in {interaction.guild.name} ({interaction.guild.id})"
     )
 
     if debugMode == True:
@@ -185,7 +185,7 @@ async def activity(interaction: discord.Interaction, steamid: str):
                     break
     if inEnabledGuild == False:
         infologger.warning(
-            f"{datetime.now()} - Command send in a dissallowed guild: {interaction.user.name} has attempted to search the activity for {steamid} in {interaction.guild.name} ({interaction.guild.id})!"
+            f"{datetime.now()} - Command send in a dissallowed guild: {interaction.user.name} ({interaction.user.id}) has attempted to search the activity for {steamid} in {interaction.guild.name} ({interaction.guild.id})!"
         )
         return
     ChannelObj = client.get_channel(config["channelid"][guildName])
@@ -216,6 +216,7 @@ async def activity(interaction: discord.Interaction, steamid: str):
             await sendErrorMsg(interaction)
             return
     else:
+        errorlogger.error(f"Error during channel check, channel not found.")
         embed1 = discord.Embed(
             title="Channel not found",
             description="The logging channel was not found. This is likely a configuration error, or the result of changes to the logging channels. Please contact `teasippingbrit` on Discord.",
@@ -231,6 +232,9 @@ async def activity(interaction: discord.Interaction, steamid: str):
             embed=embed1, ephemeral=True, delete_after=1200
         )
     else:
+        infologger.info(
+        f"{datetime.now()} - {interaction.user.name} ({interaction.user.id}) has used the incorrect format for {steamid} in {interaction.guild.name} ({interaction.guild.id})"
+        )
         embed1 = discord.Embed(
             title="Invalid parameters",
             description="The SteamID supplied either does not exist, or is of an invalid format. Please enter the ID in this format: `STEAM_0:0:431471716`",
