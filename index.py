@@ -112,7 +112,7 @@ async def fetchActivity(channel, steamID):
     channelName = list(config["channelid"].keys())[
         list(config["channelid"].values()).index(channel.id)
     ].upper()
-    if channelName == "RS" or channelName == "T":
+    if channelName == "RS":
         for i in config["longerNames"]:
             if i == channelName.lower():
                 channelName = config["longerNames"][i]
