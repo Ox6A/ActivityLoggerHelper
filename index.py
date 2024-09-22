@@ -139,7 +139,7 @@ async def activity(interaction: discord.Interaction, steamid: str):
     debuggingUserAllowed = False
 
     infologger.info(
-        f"{datetime.now()} - {interaction.user.name} has searched the activity for {steamid} in {interaction.guildName} ({interaction.guild.id})"
+        f"{datetime.now()} - {interaction.user.name} has searched the activity for {steamid} in {interaction.guild.name} ({interaction.guild.id})"
     )
 
     if debugMode == True:
@@ -180,7 +180,7 @@ async def activity(interaction: discord.Interaction, steamid: str):
                     break
     if inEnabledGuild == False:
         infologger.warning(
-            f"{datetime.now()} - Command send in a dissallowed guild: {interaction.user.name} has attempted to search the activity for {steamid} in {interaction.guildName} ({interaction.guild.id})!"
+            f"{datetime.now()} - Command send in a dissallowed guild: {interaction.user.name} has attempted to search the activity for {steamid} in {interaction.guild.name} ({interaction.guild.id})!"
         )
         return
     ChannelObj = client.get_channel(config["channelid"][guildName])
