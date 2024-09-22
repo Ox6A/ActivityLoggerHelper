@@ -115,7 +115,7 @@ async def fetchActivity(channel, steamID):
     if channelName == "RS" or channelName == "T":
         for i in config["longerNames"]:
             if i == channelName.lower():
-                channelName == config["longerNames"][i]
+                channelName = config["longerNames"][i]
                 break
     if totalSeconds == 0:
         embed1 = discord.Embed(
