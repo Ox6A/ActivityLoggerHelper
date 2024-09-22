@@ -114,7 +114,7 @@ async def fetchActivity(channel, steamID):
     ].upper()
     if channelName == "RS" or channelName == "T":
         for i in config["longerNames"]:
-            if i == channelName:
+            if i == channelName.lower():
                 channelName == config["longerNames"][i]
                 break
     if totalSeconds == 0:
